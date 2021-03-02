@@ -145,7 +145,30 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import PriorityQueue  # utilizar a fila contida em util
+
+    Pos_inicial = problem.getStartState()  # obtem a posicao inicial
+    if problem.isGoalState(Pos_inicial):  # se a posicao inicial for a da bolinha, finaliza
+        return []
+
+    visitados = []  # vetor de visitador, contendo (no, caminho)
+
+    fila_prioridade = PriorityQueue() #((x,y), direcao, custo), prioridade)
+    fila_prioridade.push((Pos_inicial, [], 0), 0)  # inicializa com posicao inicial, o caminho ate chegar nela, o custo e a prioridade
+
+    while not fila_prioridade.isEmpty():  # enquanto a fila nao for vazia
+        Pos_atual, caminho, custo_atual = fila_prioridade.pop()  # pega o topo da fila
+        if Pos_atual not in visitados:  # se a posicao atual ainda nao foi visitada
+            visitados.append(Pos_atual)  # copia o vetor
+
+            if problem.isGoalState(Pos_atual):  # encontrou a bolinha
+                return caminho  # retorna o caminho usado para chegar nessa bolinha
+
+            for Pos_proxima, direcao, custo in problem.getSuccessors(Pos_atual):
+                Nova_acao = caminho + [direcao]  # atribui novo custo para o proximo no
+                prioridade = custo_atual + custo
+                fila_prioridade.push((Pos_proxima, Nova_acao, prioridade),prioridade)  # inseri os adjascentes a fila
 
 def nullHeuristic(state, problem=None):
     """
