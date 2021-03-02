@@ -83,16 +83,64 @@ def depthFirstSearch(problem):
     understand the search problem that is being passed in:
 
     print "Start:", problem.getStartState()
+    - retorna (x, y) posicao inicial
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    - retorna booleano (True ou False) se encontrou a bolinha
+    print "St art's successors:", problem.getSuccessors(problem.getStartState())
+    - retorna os adjacentes a posicao atual, em 3 variaveis (posicao, direcao e custo) ((x, y), (North/West/South,East) e custo inteiro)
     """
+
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import Stack  # utilizar a pilha contida em util
+
+    Pos_inicial = problem.getStartState()  # obtem a posicao inicial
+    if problem.isGoalState(Pos_inicial):  # se a posicao inicial for a da bolinha, finaliza
+        return []
+
+    pilha = Stack()
+    visitados = []  # vetor de visitador, contendo (no, caminho)
+
+    pilha.push((Pos_inicial, []))  # inicializa com posicao inicial e o caminho ate chegar nela
+
+    while not pilha.isEmpty():  # enquanto a pilha nao for vazia
+        Pos_atual, caminho = pilha.pop()  # pega o topo da pilha
+        if Pos_atual not in visitados:  # se a posicao atual ainda nao foi visitada
+            visitados.append(Pos_atual)  # copia o vetor
+
+            if problem.isGoalState(Pos_atual):  # encontrou a bolinha
+                return caminho  # retorna o caminho usado para chegar nessa bolinha
+
+            for Pos_proxima, direcao, custo in problem.getSuccessors(Pos_atual):
+                Nova_acao = caminho + [direcao] #atribui novo custo para o proximo no
+                pilha.push((Pos_proxima, Nova_acao)) #inseri os adjascentes a pilha
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import Queue  # utilizar a fila contida em util
+
+    Pos_inicial = problem.getStartState()  # obtem a posicao inicial
+    if problem.isGoalState(Pos_inicial):  # se a posicao inicial for a da bolinha, finaliza
+        return []
+
+    fila = Queue()
+    visitados = []  # vetor de visitador, contendo (no, caminho)
+
+    fila.push((Pos_inicial, []))  # inicializa com posicao inicial e o caminho ate chegar nela
+
+    while not fila.isEmpty():  # enquanto a fila nao for vazia
+        Pos_atual, caminho = fila.pop()  # pega o topo da fila
+        if Pos_atual not in visitados:  # se a posicao atual ainda nao foi visitada
+            visitados.append(Pos_atual)  # copia o vetor
+
+            if problem.isGoalState(Pos_atual):  # encontrou a bolinha
+                return caminho  # retorna o caminho usado para chegar nessa bolinha
+
+            for Pos_proxima, direcao, custo in problem.getSuccessors(Pos_atual):
+                Nova_acao = caminho + [direcao]  # atribui novo custo para o proximo no
+                fila.push((Pos_proxima, Nova_acao))  # inseri os adjascentes a fila
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
