@@ -288,6 +288,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.initialState = []  #Define como vazio
 
     def getStartState(self):
         """
@@ -295,14 +296,21 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (self.startingPosition, self.initialState)  # Passa a posicao inicial e o estado vazio
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        no = state[0]
+        visitados = state[1]
+
+        if no in self.corners:
+            if not no in visitados:
+                visitados.append(no)
+            return len(visitados) == 4
+        return False
 
     def getSuccessors(self, state):
         """
@@ -314,8 +322,9 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
-        successors = []
+        x, y = state[0]
+        visitados = state[1]
+        proximos = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -325,9 +334,20 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                lista_proximos = list(visitados)
+                proximo_no = (nextx, nexty)
+                if proximo_no in self.corners:
+                    if proximo_no not in lista_proximos:
+                        lista_proximos.append(proximo_no)
+                proximo = ((proximo_no, lista_proximos), action, 1)
+                proximos.append(proximo)
 
         self._expanded += 1 # DO NOT CHANGE
-        return successors
+        return proximos
 
     def getCostOfActions(self, actions):
         """
@@ -360,7 +380,25 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Find which corners are left to reach GoalState.
+    visitedCorners = state[1]
+    cornersLeftToVisit = []
+    for corner in corners:
+        if corner not in visitedCorners:
+            cornersLeftToVisit.append(corner)
+
+    # While not all corners are visited find via manhattanDistance
+    #  the most efficient path for each corner
+    totalCost = 0
+    coordinate = state[0]
+    curPoint = coordinate
+    while cornersLeftToVisit:
+        heuristic_cost, corner = \
+            min([(util.manhattanDistance(curPoint, corner), corner) for corner in cornersLeftToVisit])
+        cornersLeftToVisit.remove(corner)
+        curPoint = corner
+        totalCost += heuristic_cost
+    return totalCost
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
