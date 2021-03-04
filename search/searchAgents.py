@@ -380,7 +380,23 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    cantos_visitador = state[1]
+    cantos_nao_visitador = []
+    for canto in corners:
+        if canto not in cantos_visitador: #se o canto nao foi visitado, ele vai pro vetor de nao visitados
+            cantos_nao_visitador.append(canto)
+
+    custo = 0
+    local = state[0]
+    posicao = local
+
+    while cantos_nao_visitador:
+        custo_heuristico, canto = \
+            min(((util.manhattanDistance(posicao, canto), canto) for canto in cantos_nao_visitador))
+        cantos_nao_visitador.remove(canto)
+        posicao = canto
+        custo += custo_heuristico
+    return custo
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
