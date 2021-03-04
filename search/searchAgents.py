@@ -391,8 +391,7 @@ def cornersHeuristic(state, problem):
     posicao = local
 
     while cantos_nao_visitador:
-        custo_heuristico, canto = \
-            min(((util.manhattanDistance(posicao, canto), canto) for canto in cantos_nao_visitador))
+        custo_heuristico, canto = min(((util.manhattanDistance(posicao, canto), canto) for canto in cantos_nao_visitador))
         cantos_nao_visitador.remove(canto)
         posicao = canto
         custo += custo_heuristico
@@ -490,7 +489,48 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    # Calcula a distancia entre a posicao atual e a comida mais proxima
+    # Calcula a distancia entre a comida mais proxima e a comida mais distante
+
+    Nao_visitados = foodGrid.asList() # coodenadas com comidas nao visitadas
+
+    Pos_atual = state[0] # posicao pacman
+
+    distancia = [] # distancia o pacman e cada comida
+
+    custo_heuristico = 0
+
+    if len(Nao_visitados) == 0: # visitou todos
+        return custo_heuristico
+
+    for pos in Nao_visitados: # calcula distancia Manhattan
+        dist = abs(pos[0] - Pos_atual[0]) + abs(pos[1] - Pos_atual[1])
+        distancia.append((dist, pos))
+    distancia = sorted(distancia) # ordena em ordem crescente, quem vem primeiro deve ser visitado primeiro, possui custo menor
+
+    custo_heuristico = custo_heuristico + distancia[0][0] # atribui custo entre a posicao e a posicao incial
+
+    comida_proxima = distancia[0][1] # comida mais perto
+
+    Nao_visitados = list(Nao_visitados)
+    for pos in Nao_visitados:
+        if pos == comida_proxima:
+            Nao_visitados.pop(Nao_visitados.index(pos)) # remove da lista a comida mais proxima
+    Nao_visitados = tuple(Nao_visitados)
+
+    if len(Nao_visitados) == 0: # visitou todos
+        return custo_heuristico
+
+    distancia = []
+    for pos in Nao_visitados: # calcula a distancia entre a primeira comida e as demais
+        dist = abs(pos[0] - comida_proxima[0]) + abs(pos[1] - comida_proxima[1])
+        distancia.append((dist, pos))
+    distancia = sorted(distancia, reverse=True) # ordena do maior ao menor
+
+    custo_heuristico = custo_heuristico + distancia[0][0] # distancia entre a comida mais perto e a mais distante a ela
+
+    return custo_heuristico
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
